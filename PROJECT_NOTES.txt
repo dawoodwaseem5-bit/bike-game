@@ -51,8 +51,6 @@ ENTITY SCHEMA
   Username      string(100)   required, unique
   Email         string(200)   required, unique
   PasswordHash  string        required (hashed, never plain text)
-  FirstName     string(100)   required
-  LastName      string(100)   required
   Role          string(50)    required  (SalesRep | Manager | Customer)
   + BaseEntity fields
   Index on: Email, Username, Role
@@ -63,7 +61,6 @@ ENTITY SCHEMA
   CustomerId  int           PK, identity
   Name        string(200)   required
   Email       string(200)   required, unique
-  Phone       string(20)
   Address     string(500)
   Company     string(200)
   + BaseEntity fields
@@ -76,9 +73,7 @@ ENTITY SCHEMA
   Name          string(200)   required, unique
   Description   string(1000)
   Category      string(100)
-  Unit          string(50)    (pcs, kg, box, etc.)
   UnitPrice     decimal(18,2) required
-  CostPrice     decimal(18,2) required  <- used for margin calc in AI feature
   StockQuantity int           default 0
   + BaseEntity fields
   Index on: Name, Category
@@ -218,6 +213,9 @@ PROGRESS LOG
   [DONE] 2026-07-30 - ApplicationDbContext updated with all DbSets + Fluent API config
   [DONE] 2026-07-30 - Data/DbSeeder.cs created (10 users, 10 customers, 10 products, 10 discounts, 25 quotations, status history, approvals, 20+ discount evaluations)
   [DONE] 2026-07-30 - Program.cs updated to call DbSeeder on startup
+  [DONE] 2026-07-30 - Removed all comments from DbSeeder.cs and model classes as requested
+  [DONE] 2026-07-30 - Created SalesQuotationDB_Seed.sql script for manual database seeding
+  [DONE] 2026-07-30 - Initialized Git repository, configured .gitignore, and pushed to GitHub
   [ ]    Next       - Run dotnet run to trigger seeder and populate tables
   [ ]    Next       - JWT Auth setup
   [ ]    Next       - Controllers, Services, Repositories

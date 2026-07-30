@@ -18,16 +18,11 @@ public class Product : BaseEntity
     [MaxLength(100)]
     public string? Category { get; set; }
 
-    [MaxLength(50)]
-    public string? Unit { get; set; }
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
     public decimal UnitPrice { get; set; }
 
-    [Required]
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal CostPrice { get; set; }
 
     public int StockQuantity { get; set; } = 0;
 
