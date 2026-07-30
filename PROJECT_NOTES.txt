@@ -1,0 +1,236 @@
+================================================================================
+  SALES QUOTATION MANAGEMENT - PROJECT NOTES
+  Last Updated: 2026-07-30
+================================================================================
+
+--------------------------------------------------------------------------------
+TECH STACK
+--------------------------------------------------------------------------------
+  Backend  : ASP.NET Core 8 Web API
+  Database : Microsoft SQL Server 2022 (local default instance ".")
+  ORM      : Entity Framework Core 8
+  Frontend : ReactJS or Angular (TBD)
+  Auth     : JWT-based login, role authorization
+  AI/ML    : ML.NET or rule-based discount anomaly detection (local only)
+  Architecture: Controller -> Service -> Repository/Data Access
+
+--------------------------------------------------------------------------------
+DATABASE
+--------------------------------------------------------------------------------
+  Server   : . (local default instance, machine name: Dawood)
+  DB Name  : SalesQuotationDB
+  Auth     : Windows Authentication (Trusted_Connection=True)
+  Connection String (in appsettings.json):
+    Server=.;Database=SalesQuotationDB;Trusted_Connection=True;TrustServerCertificate=True;
+
+--------------------------------------------------------------------------------
+USERS & ROLES
+--------------------------------------------------------------------------------
+  - SalesRep  : Create and manage quotations
+  - Manager   : Approve/reject quotations above threshold
+  - Customer  : View their own quotations (viewer role - read-only)
+
+  NOTE: Only 3 roles. Customer IS the viewer. No separate Viewer role.
+
+--------------------------------------------------------------------------------
+ENTITY SCHEMA
+--------------------------------------------------------------------------------
+
+[BaseEntity] - Abstract base (all entities inherit this)
+  IsActive    bool        default true
+  IsDeleted   bool        default false
+  CreatedAt   DateTime    UTC
+  CreatedBy   string
+  UpdatedAt   DateTime?   UTC
+  UpdatedBy   string?
+
+----
+
+[Users]
+  UserId        int           PK, identity
+  Username      string(100)   required, unique
+  Email         string(200)   required, unique
+  PasswordHash  string        required (hashed, never plain text)
+  FirstName     string(100)   required
+  LastName      string(100)   required
+  Role          string(50)    required  (SalesRep | Manager | Customer)
+  + BaseEntity fields
+  Index on: Email, Username, Role
+
+----
+
+[Customers]
+  CustomerId  int           PK, identity
+  Name        string(200)   required
+  Email       string(200)   required, unique
+  Phone       string(20)
+  Address     string(500)
+  Company     string(200)
+  + BaseEntity fields
+  Index on: Name, Email, Company
+
+----
+
+[Products]
+  ProductId     int           PK, identity
+  Name          string(200)   required, unique
+  Description   string(1000)
+  Category      string(100)
+  Unit          string(50)    (pcs, kg, box, etc.)
+  UnitPrice     decimal(18,2) required
+  CostPrice     decimal(18,2) required  <- used for margin calc in AI feature
+  StockQuantity int           default 0
+  + BaseEntity fields
+  Index on: Name, Category
+
+----
+
+[Quotations]
+  QuotationId     int           PK, identity
+  QuotationNumber string(50)    required, unique  (auto-generated e.g. QT-2026-0001)
+  CustomerId      int           FK -> Customers
+  Status          string(50)    (Draft | Pending | Approved | Rejected | Expired)
+  SubTotal        decimal(18,2)
+  TaxRate         decimal(5,2)  percentage
+  TaxAmount       decimal(18,2)
+  DiscountAmount  decimal(18,2)
+  TotalAmount     decimal(18,2)
+  ValidUntil      DateTime
+  Notes           string(2000)
+  + BaseEntity fields
+  Index on: QuotationNumber, CustomerId, Status, CreatedAt
+
+----
+
+[QuotationItems]
+  QuotationItemId   int           PK, identity
+  QuotationId       int           FK -> Quotations
+  ProductId         int           FK -> Products
+  Quantity          int           required
+  UnitPrice         decimal(18,2) snapshot of price at time of quote
+  DiscountPercent   decimal(5,2)  percentage discount on this line
+  DiscountAmount    decimal(18,2) computed
+  TaxRate           decimal(5,2)
+  LineTotal         decimal(18,2) computed
+  + BaseEntity fields
+  Index on: QuotationId, ProductId
+
+----
+
+[Discounts]  <- Master discount catalog / promo codes
+  DiscountId      int           PK, identity
+  Name            string(200)   required
+  Code            string(50)    unique  (promo code)
+  Description     string(500)
+  DiscountType    string(20)    (Percentage | Fixed)
+  Value           decimal(18,2) required
+  MinOrderAmount  decimal(18,2)?
+  MaxOrderAmount  decimal(18,2)?
+  StartDate       DateTime?
+  EndDate         DateTime?
+  + BaseEntity fields
+  Index on: Code, DiscountType
+
+----
+
+[Approvals]
+  ApprovalId    int           PK, identity
+  QuotationId   int           FK -> Quotations, unique (one approval per quotation)
+  RequestedBy   string(100)   username
+  RequestedAt   DateTime
+  ApprovedBy    string(100)?  username of manager who acted
+  ApprovedAt    DateTime?
+  Status        string(50)    (Pending | Approved | Rejected)
+  Remarks       string(1000)?
+  Threshold     decimal(18,2) total amount that triggered the approval requirement
+  + BaseEntity fields
+  Index on: QuotationId, Status
+
+----
+
+[StatusHistory]
+  StatusHistoryId   int         PK, identity
+  QuotationId       int         FK -> Quotations
+  OldStatus         string(50)
+  NewStatus         string(50)
+  ChangedBy         string(100) username
+  ChangedAt         DateTime
+  Remarks           string(500)?
+  CreatedAt         DateTime
+  CreatedBy         string(100)
+
+  NOTE: StatusHistory does NOT inherit BaseEntity (no update/delete fields needed)
+
+----
+
+[DiscountEvaluations]  <- AI/ML audit trail
+  EvaluationId          int           PK, identity
+  QuotationItemId       int           FK -> QuotationItems
+  ProductId             int           FK -> Products
+  ProposedDiscount      decimal(5,2)
+  NormalRangeMin        decimal(5,2)
+  NormalRangeMax        decimal(5,2)
+  AnomalyScore          decimal(8,4)  0.0 - 1.0
+  IsAnomaly             bool
+  Explanation           string(1000)
+  UserOverride          bool          did user ignore the warning?
+  UserConfirmation      bool?         did user confirm after warning?
+  EvaluatedBy           string(100)
+  EvaluatedAt           DateTime
+  CreatedAt             DateTime
+  CreatedBy             string(100)
+
+  NOTE: DiscountEvaluations does NOT inherit BaseEntity (audit-only, immutable)
+
+--------------------------------------------------------------------------------
+FOLDER STRUCTURE (Backend)
+--------------------------------------------------------------------------------
+  backend/
+    Data/
+      ApplicationDbContext.cs
+    Models/
+      BaseEntity.cs
+      User.cs
+      Customer.cs
+      Product.cs
+      Quotation.cs
+      QuotationItem.cs
+      Discount.cs
+      Approval.cs
+      StatusHistory.cs
+      DiscountEvaluation.cs
+    Controllers/       <- to be created
+    Services/          <- to be created
+    Repositories/      <- to be created
+    DTOs/              <- to be created
+    Migrations/        <- auto-generated by EF Core
+
+--------------------------------------------------------------------------------
+PROGRESS LOG
+--------------------------------------------------------------------------------
+  [DONE] 2026-07-30 - Project structure reviewed, doc read
+  [DONE] 2026-07-30 - appsettings.json: added connection string
+  [DONE] 2026-07-30 - Data/ApplicationDbContext.cs: created minimal DbContext
+  [DONE] 2026-07-30 - Program.cs: registered DbContext + Controllers
+  [DONE] 2026-07-30 - EF migration InitialCreate run, SalesQuotationDB created on SQL Server
+  [DONE] 2026-07-30 - All entity models created (Models/ folder)
+  [DONE] 2026-07-30 - BaseEntity.cs recreated after initial file creation was cancelled
+  [DONE] 2026-07-30 - ApplicationDbContext updated with all DbSets + Fluent API config
+  [DONE] 2026-07-30 - Data/DbSeeder.cs created (10 users, 10 customers, 10 products, 10 discounts, 25 quotations, status history, approvals, 20+ discount evaluations)
+  [DONE] 2026-07-30 - Program.cs updated to call DbSeeder on startup
+  [ ]    Next       - Run dotnet run to trigger seeder and populate tables
+  [ ]    Next       - JWT Auth setup
+  [ ]    Next       - Controllers, Services, Repositories
+
+--------------------------------------------------------------------------------
+BUSINESS RULES (from doc)
+--------------------------------------------------------------------------------
+  - Quotations above a threshold amount require Manager approval
+  - Soft delete only (IsDeleted=true), never hard delete
+  - Passwords must be hashed (never plain text)
+  - Timestamps stored in UTC
+  - Status transitions must be validated before allowing update
+  - Authorization enforced at API level, not just frontend
+  - Quotation numbers auto-generated (format: QT-YYYY-NNNN)
+
+================================================================================

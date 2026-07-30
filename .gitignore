@@ -1,0 +1,31 @@
+# Build outputs
+bin/
+obj/
+
+# .NET user secrets
+*.user
+*.suo
+.vs/
+
+# ASP.NET Core
+appsettings.Development.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node / Frontend
+node_modules/
+dist/
+.next/
+.nuxt/
+
+# IDE
+.vscode/
+.idea/
+
+# EF Core migrations — keep these in git
+# (do NOT ignore Migrations/)
