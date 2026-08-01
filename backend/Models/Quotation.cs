@@ -36,9 +36,6 @@ public class Quotation : BaseEntity
 
     public DateTime? ValidUntil { get; set; }
 
-    [MaxLength(2000)]
-    public string? Notes { get; set; }
-
     [ForeignKey("CustomerId")]
     public Customer? Customer { get; set; }
 

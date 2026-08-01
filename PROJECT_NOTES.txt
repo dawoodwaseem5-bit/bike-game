@@ -71,12 +71,10 @@ ENTITY SCHEMA
 [Products]
   ProductId     int           PK, identity
   Name          string(200)   required, unique
-  Description   string(1000)
-  Category      string(100)
   UnitPrice     decimal(18,2) required
   StockQuantity int           default 0
   + BaseEntity fields
-  Index on: Name, Category
+  Index on: Name
 
 ----
 
@@ -91,7 +89,6 @@ ENTITY SCHEMA
   DiscountAmount  decimal(18,2)
   TotalAmount     decimal(18,2)
   ValidUntil      DateTime
-  Notes           string(2000)
   + BaseEntity fields
   Index on: QuotationNumber, CustomerId, Status, CreatedAt
 
@@ -116,7 +113,6 @@ ENTITY SCHEMA
   DiscountId      int           PK, identity
   Name            string(200)   required
   Code            string(50)    unique  (promo code)
-  Description     string(500)
   DiscountType    string(20)    (Percentage | Fixed)
   Value           decimal(18,2) required
   MinOrderAmount  decimal(18,2)?
@@ -216,8 +212,10 @@ PROGRESS LOG
   [DONE] 2026-07-30 - Removed all comments from DbSeeder.cs and model classes as requested
   [DONE] 2026-07-30 - Created SalesQuotationDB_Seed.sql script for manual database seeding
   [DONE] 2026-07-30 - Initialized Git repository, configured .gitignore, and pushed to GitHub
-  [ ]    Next       - Run dotnet run to trigger seeder and populate tables
-  [ ]    Next       - JWT Auth setup
+  [DONE] 2026-08-01 - Reduced fields in Models (Product, Quotation, Discount)
+  [DONE] 2026-08-01 - JWT Auth setup started (AuthController added, Program.cs updated)
+  [DONE] 2026-08-01 - Run dotnet run to trigger seeder and populate tables
+  [DONE] 2026-08-01 - JWT Auth setup finished and verified successfully
   [ ]    Next       - Controllers, Services, Repositories
 
 --------------------------------------------------------------------------------

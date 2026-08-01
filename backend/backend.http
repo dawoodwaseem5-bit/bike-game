@@ -1,6 +1,40 @@
-@backend_HostAddress = http://localhost:5273
+POST http://localhost:5273/api/auth/login
+Content-Type: application/json
 
-GET {{backend_HostAddress}}/weatherforecast/
-Accept: application/json
+{
+  "email": "dawood@admin.com",
+  "password": "Admin@123"
+}
 
 ###
+GET http://localhost:5273/api/customers?page=1&pageSize=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
+
+###
+POST http://localhost:5273/api/customers
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
+
+{
+  "name": "Ali Raza",
+  "email": "ali.raza@example.com",
+  "company": "Raza Tech",
+  "address": "Lahore, Pakistan"
+}
+
+###
+GET http://localhost:5273/api/products?search=Laptop
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
+
+###
+POST http://localhost:5273/api/products
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
+
+{
+  "name": "MacBook Pro M3",
+  "unitPrice": 250000.00,
+  "stockQuantity": 15
+}
+
+

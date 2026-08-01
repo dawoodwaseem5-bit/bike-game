@@ -15,9 +15,6 @@ public class Discount : BaseEntity
     [MaxLength(50)]
     public string? Code { get; set; }
 
-    [MaxLength(500)]
-    public string? Description { get; set; }
-
     [Required]
     [MaxLength(20)]
     public string DiscountType { get; set; } = "Percentage";

@@ -45,7 +45,6 @@ public class ApplicationDbContext : DbContext
         {
             e.HasKey(p => p.ProductId);
             e.HasIndex(p => p.Name).IsUnique();
-            e.HasIndex(p => p.Category);
         });
 
         // ── Quotations ───────────────────────────────────────────────────────
