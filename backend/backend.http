@@ -37,4 +37,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1ha
   "stockQuantity": 15
 }
 
+###
+GET http://localhost:5273/api/dashboard/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
 
+###
+POST http://localhost:5273/api/quotations
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjI0ZTBmYzU0LWRlZjYtNDAwZi1hMGEwLWU1YzZiMTNhMTg0ZCIsImV4cCI6MTc4NTY3NDg4MCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.0phg-yBJYMbILUEgSDXM7FNXd9lXg5YJIPBblC64K10
+
+{
+  "customerId": 1,
+  "taxRate": 16.00,
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2,
+      "discountPercent": 5.0
+    }
+  ]
+}
+
+###
+GET http://localhost:5273/api/quotations?page=1&pageSize=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjI0ZTBmYzU0LWRlZjYtNDAwZi1hMGEwLWU1YzZiMTNhMTg0ZCIsImV4cCI6MTc4NTY3NDg4MCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.0phg-yBJYMbILUEgSDXM7FNXd9lXg5YJIPBblC64K10
