@@ -229,4 +229,36 @@ BUSINESS RULES (from doc)
   - Authorization enforced at API level, not just frontend
   - Quotation numbers auto-generated (format: QT-YYYY-NNNN)
 
+--------------------------------------------------------------------------------
+HOW TO RUN ON A NEW PC (FROM GITHUB)
+--------------------------------------------------------------------------------
+1. PREREQUISITES TO DOWNLOAD:
+   - Git (to clone the repo)
+   - .NET 8 SDK (crucial for running the ASP.NET Core Web API)
+   - VS Code & SQL Server 2022 (already installed)
+
+2. GLOBAL TOOLS TO INSTALL (Open Terminal/Command Prompt):
+   - Install EF Core CLI to manage database migrations: 
+     run: dotnet tool install --global dotnet-ef
+
+3. CLONE & RESTORE PACKAGES:
+   - Run: git clone <your-github-repo-url>
+   - Open the "backend" folder in VS Code.
+   - Run: dotnet restore (this will automatically download all required NuGet packages like Microsoft.EntityFrameworkCore, System.IdentityModel.Tokens.Jwt, etc.)
+
+4. THINGS TO CHANGE (Configuration):
+   - Open backend/appsettings.json
+   - Find "ConnectionStrings": "DefaultConnection"
+   - By default, it uses "Server=.;Database=SalesQuotationDB;Trusted_Connection=True;..."
+   - If your SQL Server instance name is different (e.g., .\SQLEXPRESS), change "Server=." to "Server=.\\SQLEXPRESS". If it's the default, leave it as ".".
+
+5. CREATE THE DATABASE:
+   - In the terminal (inside the "backend" folder), run:
+     dotnet ef database update
+   - This will connect to your SQL Server and create the SalesQuotationDB with all tables.
+
+6. RUN THE PROJECT:
+   - Run: dotnet run
+   - The API will start on http://localhost:5273. You can test it via backend.http.
+
 ================================================================================
