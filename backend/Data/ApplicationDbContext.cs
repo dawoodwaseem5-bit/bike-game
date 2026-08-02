@@ -126,7 +126,7 @@ public class ApplicationDbContext : DbContext
             e.HasOne(de => de.Product)
              .WithMany(p => p.DiscountEvaluations)
              .HasForeignKey(de => de.ProductId)
-             .OnDelete(DeleteBehavior.NoAction); // avoid multiple cascade paths
+             .OnDelete(DeleteBehavior.NoAction); 
         });
     }
 }

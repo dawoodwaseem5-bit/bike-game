@@ -52,7 +52,19 @@ namespace backend.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return Ok(new { Token = tokenString, Message = "Login successful!" });
+            // Frontend ke liye asani paida karne ke liye token ke sath user ki details bhi bhej rahay hain
+            return Ok(new 
+            { 
+                Token = tokenString, 
+                Message = "Login successful!",
+                User = new 
+                {
+                    UserId = user.UserId,
+                    Email = user.Email,
+                    Role = user.Role,
+                    Username = user.Username
+                }
+            });
         }
     }
 

@@ -48,6 +48,18 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -71,6 +83,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 // --- CONNECTION TEST END ---
+
+app.UseCors("AllowFrontend");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

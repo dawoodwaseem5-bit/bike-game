@@ -216,7 +216,9 @@ PROGRESS LOG
   [DONE] 2026-08-01 - JWT Auth setup started (AuthController added, Program.cs updated)
   [DONE] 2026-08-01 - Run dotnet run to trigger seeder and populate tables
   [DONE] 2026-08-01 - JWT Auth setup finished and verified successfully
-  [ ]    Next       - Controllers, Services, Repositories
+  [DONE] 2026-08-02 - Controllers implemented (Customers, Products, Quotations, Dashboard)
+  [DONE] 2026-08-02 - Frontend React app initialized and simple Login connected
+  [ ]    Next       - Frontend UI design and routing (React)
 
 --------------------------------------------------------------------------------
 BUSINESS RULES (from doc)
@@ -235,6 +237,7 @@ HOW TO RUN ON A NEW PC (FROM GITHUB)
 1. PREREQUISITES TO DOWNLOAD:
    - Git (to clone the repo)
    - .NET 8 SDK (crucial for running the ASP.NET Core Web API)
+   - Node.js (crucial for running the React Frontend)
    - VS Code & SQL Server 2022 (already installed)
 
 2. GLOBAL TOOLS TO INSTALL (Open Terminal/Command Prompt):
@@ -257,8 +260,14 @@ HOW TO RUN ON A NEW PC (FROM GITHUB)
      dotnet ef database update
    - This will connect to your SQL Server and create the SalesQuotationDB with all tables.
 
-6. RUN THE PROJECT:
+6. RUN THE BACKEND PROJECT:
    - Run: dotnet run
    - The API will start on http://localhost:5273. You can test it via backend.http.
+
+7. RUN THE FRONTEND PROJECT:
+   - Open a NEW terminal and navigate to the "frontend" folder (cd frontend).
+   - Run: npm install (this will download React dependencies)
+   - Run: npm start
+   - The React app will open in your browser at http://localhost:3000.
 
 ================================================================================
