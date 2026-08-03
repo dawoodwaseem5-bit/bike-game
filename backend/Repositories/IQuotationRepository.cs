@@ -1,0 +1,14 @@
+using backend.Models;
+
+namespace backend.Repositories
+{
+    public interface IQuotationRepository
+    {
+        Task<(int TotalItems, IEnumerable<object> Items)> GetPaginatedAsync(int page, int pageSize, string search);
+        Task<Quotation?> GetByIdAsync(int id);
+        Task<bool> CustomerExistsAsync(int customerId);
+        Task<Product?> GetProductByIdAsync(int productId);
+        Task AddAsync(Quotation quotation);
+        Task SaveChangesAsync();
+    }
+}

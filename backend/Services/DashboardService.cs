@@ -1,0 +1,30 @@
+using backend.Repositories;
+
+namespace backend.Services
+{
+    public class DashboardService : IDashboardService
+    {
+        private readonly IDashboardRepository _dashboardRepository;
+
+        public DashboardService(IDashboardRepository dashboardRepository)
+        {
+            _dashboardRepository = dashboardRepository;
+        }
+
+        public async Task<object> GetDashboardSummaryAsync()
+        {
+            var totalCustomers = await _dashboardRepository.GetTotalCustomersAsync();
+            var totalProducts = await _dashboardRepository.GetTotalProductsAsync();
+            var totalQuotations = await _dashboardRepository.GetTotalQuotationsAsync();
+            var totalRevenue = await _dashboardRepository.GetTotalRevenueAsync();
+
+            return new
+            {
+                totalCustomers,
+                totalProducts,
+                totalQuotations,
+                totalRevenue
+            };
+        }
+    }
+}

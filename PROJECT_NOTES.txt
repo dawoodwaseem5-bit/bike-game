@@ -218,6 +218,8 @@ PROGRESS LOG
   [DONE] 2026-08-01 - JWT Auth setup finished and verified successfully
   [DONE] 2026-08-02 - Controllers implemented (Customers, Products, Quotations, Dashboard)
   [DONE] 2026-08-02 - Frontend React app initialized and simple Login connected
+  [DONE] 2026-08-03 - User Management controllers implemented (Customer Self-Registration & Manager adding SalesRep)
+  [DONE] 2026-08-03 - Refactored entire backend to a clean 3-Tier Architecture (Controllers > Services > Repositories)
   [ ]    Next       - Frontend UI design and routing (React)
 
 --------------------------------------------------------------------------------

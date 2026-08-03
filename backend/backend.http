@@ -1,4 +1,8 @@
-POST http://localhost:5273/api/auth/login
+@backend_HostAddress = http://localhost:5273
+
+### Login (Gets JWT Token)
+# @name login
+POST {{backend_HostAddress}}/api/auth/login
 Content-Type: application/json
 
 {
@@ -7,13 +11,43 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:5273/api/customers?page=1&pageSize=10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
+
+@token = {{login.response.body.token}}
+
+### Register a new Customer (Public)
+POST {{backend_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "Customer_1",
+  "email": "customer1@test.com",
+  "password": "Customer@123"
+}
 
 ###
-POST http://localhost:5273/api/customers
+
+### Create a new User (Manager Only)
+POST {{backend_HostAddress}}/api/users
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJkYXdvb2RAYWRtaW4uY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiTWFuYWdlciIsImp0aSI6IjlkZTIyNzhlLTllYmQtNGExNS05ZWUyLWNmOWE0MTY3MTg3ZSIsImV4cCI6MTc4NTYwMDgxOCwiaXNzIjoiU2FsZXNRdW90YXRpb25BcHAiLCJhdWQiOiJTYWxlc1F1b3RhdGlvblVzZXJzIn0.Z5Meaj1T6WDmEmv94ONdf-0dmt3Dek1LVKi_2_wLW9M
+Authorization: Bearer {{token}}
+
+{
+  "username": "new_sales_rep",
+  "email": "sales_new@test.com",
+  "password": "Sales123",
+  "role": "SalesRep"
+}
+
+###
+
+GET {{backend_HostAddress}}/api/customers?page=1&pageSize=10
+Authorization: Bearer {{token}}
+
+###
+
+POST {{backend_HostAddress}}/api/customers
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "Ali Raza",
