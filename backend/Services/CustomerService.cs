@@ -1,3 +1,4 @@
+using backend.DTOs;
 using backend.Models;
 using backend.Repositories;
 
@@ -26,35 +27,64 @@ namespace backend.Services
             };
         }
 
-        public async Task<Customer> CreateCustomerAsync(Customer customer, string username)
+        public async Task<CustomerResponseDto> CreateCustomerAsync(CustomerCreateDto dto, string username)
         {
-            customer.CreatedAt = DateTime.UtcNow;
-            customer.CreatedBy = username;
+            var customer = new Customer
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Address = dto.Address,
+                Company = dto.Company,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = username,
+                IsActive = true,
+                IsDeleted = false
+            };
 
             await _customerRepository.AddAsync(customer);
             await _customerRepository.SaveChangesAsync();
 
-            return customer;
+            return new CustomerResponseDto
+            {
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Address = customer.Address,
+                Company = customer.Company,
+                IsActive = customer.IsActive,
+                CreatedAt = customer.CreatedAt
+            };
         }
 
-        public async Task<(bool Success, string Message, Customer? UpdatedCustomer)> UpdateCustomerAsync(int id, Customer updateModel, string username)
+        public async Task<(bool Success, string Message, CustomerResponseDto? UpdatedCustomer)> UpdateCustomerAsync(int id, CustomerUpdateDto dto, string username)
         {
             var customer = await _customerRepository.GetByIdAsync(id);
             if (customer == null)
                 return (false, "Customer not found.", null);
 
-            customer.Name = updateModel.Name;
-            customer.Email = updateModel.Email;
-            customer.Address = updateModel.Address;
-            customer.Company = updateModel.Company;
-            customer.IsActive = updateModel.IsActive;
+            customer.Name = dto.Name;
+            customer.Email = dto.Email;
+            customer.Address = dto.Address;
+            customer.Company = dto.Company;
+            customer.IsActive = dto.IsActive;
 
             customer.UpdatedAt = DateTime.UtcNow;
             customer.UpdatedBy = username;
 
             await _customerRepository.SaveChangesAsync();
 
-            return (true, "Customer updated successfully.", customer);
+            var responseDto = new CustomerResponseDto
+            {
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Address = customer.Address,
+                Company = customer.Company,
+                IsActive = customer.IsActive,
+                CreatedAt = customer.CreatedAt
+            };
+
+            return (true, "Customer updated successfully.", responseDto);
         }
 
         public async Task<(bool Success, string Message)> DeleteCustomerAsync(int id, string username)

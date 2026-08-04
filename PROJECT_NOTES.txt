@@ -220,6 +220,7 @@ PROGRESS LOG
   [DONE] 2026-08-02 - Frontend React app initialized and simple Login connected
   [DONE] 2026-08-03 - User Management controllers implemented (Customer Self-Registration & Manager adding SalesRep)
   [DONE] 2026-08-03 - Refactored entire backend to a clean 3-Tier Architecture (Controllers > Services > Repositories)
+  [DONE] 2026-08-04 - Grouped and implemented DTOs for Auth, Users, Customers, Products, Quotations, and Dashboard
   [ ]    Next       - Frontend UI design and routing (React)
 
 --------------------------------------------------------------------------------

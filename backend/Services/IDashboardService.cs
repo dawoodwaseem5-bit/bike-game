@@ -1,7 +1,9 @@
+using backend.DTOs;
+
 namespace backend.Services
 {
     public interface IDashboardService
     {
-        Task<object> GetDashboardSummaryAsync();
+        Task<DashboardSummaryResponseDto> GetDashboardSummaryAsync();
     }
 }

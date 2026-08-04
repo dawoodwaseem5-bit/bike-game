@@ -1,4 +1,4 @@
-using backend.Controllers;
+using backend.DTOs;
 using backend.Models;
 using backend.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +20,7 @@ namespace backend.Services
             _config = config;
         }
 
-        public async Task<(bool Success, string Message, string Token, object? UserDetails)> LoginAsync(LoginRequest req)
+        public async Task<(bool Success, string Message, string Token, object? UserDetails)> LoginAsync(LoginRequestDto req)
         {
             var user = await _userRepository.GetByEmailAsync(req.Email);
 
@@ -60,7 +60,7 @@ namespace backend.Services
             return (true, "Login successful!", tokenString, userDetails);
         }
 
-        public async Task<(bool Success, string Message)> RegisterCustomerAsync(RegisterRequest req)
+        public async Task<(bool Success, string Message)> RegisterCustomerAsync(RegisterRequestDto req)
         {
             if (await _userRepository.EmailExistsAsync(req.Email))
                 return (false, "Email already exists.");

@@ -35,7 +35,7 @@ namespace backend.Repositories
 
         public async Task AddAsync(User user)
         {
-            _db.Users.Add(user);
+            await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
         }
     }

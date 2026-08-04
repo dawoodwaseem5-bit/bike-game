@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services;
+using backend.DTOs;
 using System.Security.Claims;
 
 namespace backend.Controllers
@@ -24,21 +25,6 @@ namespace backend.Controllers
         {
             var result = await _quotationService.GetQuotationsPaginatedAsync(page, pageSize, search);
             return Ok(result);
-        }
-
-        public class QuotationCreateDto
-        {
-            public int CustomerId { get; set; }
-            public decimal TaxRate { get; set; }
-            public DateTime? ValidUntil { get; set; }
-            public List<QuotationItemDto> Items { get; set; } = new();
-        }
-
-        public class QuotationItemDto
-        {
-            public int ProductId { get; set; }
-            public int Quantity { get; set; }
-            public decimal DiscountPercent { get; set; }
         }
 
         [HttpPost]

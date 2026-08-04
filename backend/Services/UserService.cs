@@ -1,4 +1,4 @@
-using backend.Controllers;
+using backend.DTOs;
 using backend.Models;
 using backend.Repositories;
 
@@ -13,7 +13,7 @@ namespace backend.Services
             _userRepository = userRepository;
         }
 
-        public async Task<(bool Success, string Message, int? UserId)> CreateUserAsync(CreateUserRequest req, string adminEmail)
+        public async Task<(bool Success, string Message, UserResponseDto? User)> CreateUserAsync(CreateUserRequestDto req, string adminEmail)
         {
             if (await _userRepository.EmailExistsAsync(req.Email))
                 return (false, "Email already exists.", null);
@@ -37,7 +37,18 @@ namespace backend.Services
             };
 
             await _userRepository.AddAsync(newUser);
-            return (true, $"{req.Role} created successfully!", newUser.UserId);
+            
+            var userResponse = new UserResponseDto
+            {
+                UserId = newUser.UserId,
+                Username = newUser.Username,
+                Email = newUser.Email,
+                Role = newUser.Role,
+                IsActive = newUser.IsActive,
+                CreatedAt = newUser.CreatedAt
+            };
+
+            return (true, $"{req.Role} created successfully!", userResponse);
         }
     }
 }

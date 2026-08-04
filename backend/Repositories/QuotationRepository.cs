@@ -59,7 +59,7 @@ namespace backend.Repositories
 
         public async Task AddAsync(Quotation quotation)
         {
-            _db.Quotations.Add(quotation);
+            await _db.Quotations.AddAsync(quotation);
         }
 
         public async Task SaveChangesAsync()

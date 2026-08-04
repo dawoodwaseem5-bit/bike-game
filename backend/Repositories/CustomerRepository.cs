@@ -39,7 +39,7 @@ namespace backend.Repositories
 
         public async Task AddAsync(Customer customer)
         {
-            _db.Customers.Add(customer);
+            await _db.Customers.AddAsync(customer);
         }
 
         public async Task SaveChangesAsync()

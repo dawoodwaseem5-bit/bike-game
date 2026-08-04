@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using backend.Models;
 using backend.Services;
+using backend.DTOs;
 using System.Security.Claims;
 
 namespace backend.Controllers
@@ -18,6 +19,8 @@ namespace backend.Controllers
             _customerService = customerService;
         }
 
+        private string GetEmail() => User.FindFirst(ClaimTypes.Email)?.Value ?? "system";
+
         [HttpGet]
         public async Task<IActionResult> GetCustomers([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string search = "")
         {
@@ -26,24 +29,20 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer([FromBody] Customer customer)
+        public async Task<IActionResult> CreateCustomer([FromBody] CustomerCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var username = User.FindFirstValue(ClaimTypes.Email) ?? "Unknown";
-
-            var createdCustomer = await _customerService.CreateCustomerAsync(customer, username);
+            var createdCustomer = await _customerService.CreateCustomerAsync(dto, GetEmail());
 
             return CreatedAtAction(nameof(GetCustomers), new { id = createdCustomer.CustomerId }, createdCustomer);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCustomer(int id, [FromBody] Customer updateModel)
+        public async Task<IActionResult> UpdateCustomer(int id, [FromBody] CustomerUpdateDto dto)
         {
-            var username = User.FindFirstValue(ClaimTypes.Email) ?? "Unknown";
-            
-            var result = await _customerService.UpdateCustomerAsync(id, updateModel, username);
+            var result = await _customerService.UpdateCustomerAsync(id, dto, GetEmail());
             if (!result.Success)
                 return NotFound(new { Message = result.Message });
 

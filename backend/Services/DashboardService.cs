@@ -1,3 +1,4 @@
+using backend.DTOs;
 using backend.Repositories;
 
 namespace backend.Services
@@ -11,19 +12,19 @@ namespace backend.Services
             _dashboardRepository = dashboardRepository;
         }
 
-        public async Task<object> GetDashboardSummaryAsync()
+        public async Task<DashboardSummaryResponseDto> GetDashboardSummaryAsync()
         {
             var totalCustomers = await _dashboardRepository.GetTotalCustomersAsync();
             var totalProducts = await _dashboardRepository.GetTotalProductsAsync();
             var totalQuotations = await _dashboardRepository.GetTotalQuotationsAsync();
             var totalRevenue = await _dashboardRepository.GetTotalRevenueAsync();
 
-            return new
+            return new DashboardSummaryResponseDto
             {
-                totalCustomers,
-                totalProducts,
-                totalQuotations,
-                totalRevenue
+                TotalCustomers = totalCustomers,
+                TotalProducts = totalProducts,
+                TotalQuotations = totalQuotations,
+                TotalRevenue = totalRevenue
             };
         }
     }

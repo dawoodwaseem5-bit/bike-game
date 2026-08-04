@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services;
+using backend.DTOs;
 using System.Security.Claims;
 
 namespace backend.Controllers
@@ -18,7 +19,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest req)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto req)
         {
             var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "Admin";
 
@@ -27,15 +28,7 @@ namespace backend.Controllers
             if (!result.Success)
                 return BadRequest(new { Message = result.Message });
 
-            return Ok(new { Message = result.Message, UserId = result.UserId });
+            return Ok(new { Message = result.Message, User = result.User });
         }
-    }
-
-    public class CreateUserRequest
-    {
-        public string Username { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Password { get; set; } = "";
-        public string Role { get; set; } = "";
     }
 }

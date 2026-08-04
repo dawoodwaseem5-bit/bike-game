@@ -1,4 +1,4 @@
-using backend.Controllers;
+using backend.DTOs;
 using backend.Models;
 using backend.Repositories;
 
@@ -27,7 +27,7 @@ namespace backend.Services
             };
         }
 
-        public async Task<(bool Success, string Message, Quotation? Quotation)> CreateQuotationAsync(QuotationsController.QuotationCreateDto dto, string username)
+        public async Task<(bool Success, string Message, QuotationResponseDto? Quotation)> CreateQuotationAsync(QuotationCreateDto dto, string username)
         {
             if (!await _quotationRepository.CustomerExistsAsync(dto.CustomerId))
                 return (false, "Customer not found.", null);
@@ -80,10 +80,25 @@ namespace backend.Services
             await _quotationRepository.AddAsync(quotation);
             await _quotationRepository.SaveChangesAsync();
 
-            return (true, "Quotation created successfully.", quotation);
+            var responseDto = new QuotationResponseDto
+            {
+                QuotationId = quotation.QuotationId,
+                QuotationNumber = quotation.QuotationNumber,
+                CustomerId = quotation.CustomerId,
+                Status = quotation.Status,
+                SubTotal = quotation.SubTotal,
+                DiscountAmount = quotation.DiscountAmount,
+                TaxRate = quotation.TaxRate,
+                TaxAmount = quotation.TaxAmount,
+                TotalAmount = quotation.TotalAmount,
+                ValidUntil = quotation.ValidUntil,
+                CreatedAt = quotation.CreatedAt
+            };
+
+            return (true, "Quotation created successfully.", responseDto);
         }
 
-        public async Task<(bool Success, string Message, Quotation? UpdatedQuotation)> UpdateQuotationStatusAsync(int id, string status, string username)
+        public async Task<(bool Success, string Message, QuotationResponseDto? UpdatedQuotation)> UpdateQuotationStatusAsync(int id, string status, string username)
         {
             var quotation = await _quotationRepository.GetByIdAsync(id);
             if (quotation == null)
@@ -95,7 +110,22 @@ namespace backend.Services
 
             await _quotationRepository.SaveChangesAsync();
 
-            return (true, "Quotation status updated successfully.", quotation);
+            var responseDto = new QuotationResponseDto
+            {
+                QuotationId = quotation.QuotationId,
+                QuotationNumber = quotation.QuotationNumber,
+                CustomerId = quotation.CustomerId,
+                Status = quotation.Status,
+                SubTotal = quotation.SubTotal,
+                DiscountAmount = quotation.DiscountAmount,
+                TaxRate = quotation.TaxRate,
+                TaxAmount = quotation.TaxAmount,
+                TotalAmount = quotation.TotalAmount,
+                ValidUntil = quotation.ValidUntil,
+                CreatedAt = quotation.CreatedAt
+            };
+
+            return (true, "Quotation status updated successfully.", responseDto);
         }
 
         public async Task<(bool Success, string Message)> DeleteQuotationAsync(int id, string username)
