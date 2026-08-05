@@ -13,9 +13,9 @@ namespace backend.Services
             _quotationRepository = quotationRepository;
         }
 
-        public async Task<object> GetQuotationsPaginatedAsync(int page, int pageSize, string search)
+        public async Task<object> GetQuotationsPaginatedAsync(int page, int pageSize, string search, string email = "", string role = "")
         {
-            var (totalItems, items) = await _quotationRepository.GetPaginatedAsync(page, pageSize, search);
+            var (totalItems, items) = await _quotationRepository.GetPaginatedAsync(page, pageSize, search, email, role);
 
             return new
             {
@@ -37,7 +37,7 @@ namespace backend.Services
                 CustomerId = dto.CustomerId,
                 TaxRate = dto.TaxRate,
                 ValidUntil = dto.ValidUntil,
-                Status = "Draft",
+                Status = "Pending",
                 QuotationNumber = $"QT-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4)}",
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = username

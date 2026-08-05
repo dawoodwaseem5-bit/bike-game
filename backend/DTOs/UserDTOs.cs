@@ -17,7 +17,7 @@ namespace backend.DTOs
         public string Password { get; set; } = string.Empty;
 
         [Required]
-        public string Role { get; set; } = string.Empty; // e.g., "SalesRep", "Manager"
+        public string Role { get; set; } = string.Empty;
     }
 
     public class UserResponseDto

@@ -9,7 +9,7 @@ namespace backend.Controllers
 {
     [Route("api/products")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Manager,SalesRep")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;

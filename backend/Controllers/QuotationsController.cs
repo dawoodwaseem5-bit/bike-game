@@ -23,11 +23,15 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetQuotations([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string search = "")
         {
-            var result = await _quotationService.GetQuotationsPaginatedAsync(page, pageSize, search);
+            var email = GetEmail();
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+            
+            var result = await _quotationService.GetQuotationsPaginatedAsync(page, pageSize, search, email, role);
             return Ok(result);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager,SalesRep")]
         public async Task<IActionResult> CreateQuotation([FromBody] QuotationCreateDto dto)
         {
             var result = await _quotationService.CreateQuotationAsync(dto, GetEmail());
@@ -38,6 +42,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
         {
             var result = await _quotationService.UpdateQuotationStatusAsync(id, status, GetEmail());
@@ -47,6 +52,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager,SalesRep")]
         public async Task<IActionResult> DeleteQuotation(int id)
         {
             var result = await _quotationService.DeleteQuotationAsync(id, GetEmail());

@@ -22,16 +22,27 @@ namespace backend.Repositories
             return await _db.Products.CountAsync(p => !p.IsDeleted);
         }
 
-        public async Task<int> GetTotalQuotationsAsync()
+        public async Task<int> GetTotalQuotationsAsync(string email = "", string role = "")
         {
-            return await _db.Quotations.CountAsync(q => !q.IsDeleted);
+            var query = _db.Quotations.Where(q => !q.IsDeleted);
+            if (role == "Customer" && !string.IsNullOrEmpty(email))
+            {
+                query = query.Where(q => q.Customer != null && q.Customer.Email == email);
+            }
+            return await query.CountAsync();
         }
 
-        public async Task<decimal> GetTotalRevenueAsync()
+        public async Task<decimal> GetTotalRevenueAsync(string email = "", string role = "")
         {
-            return await _db.Quotations
-                .Where(q => !q.IsDeleted && q.Status != "Draft" && q.Status != "Rejected")
-                .SumAsync(q => q.TotalAmount);
+            var query = _db.Quotations
+                .Where(q => !q.IsDeleted && q.Status == "Approved");
+            
+            if (role == "Customer" && !string.IsNullOrEmpty(email))
+            {
+                query = query.Where(q => q.Customer != null && q.Customer.Email == email);
+            }
+            
+            return await query.SumAsync(q => (decimal?)q.TotalAmount) ?? 0;
         }
     }
 }

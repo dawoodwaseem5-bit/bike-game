@@ -4,7 +4,7 @@ namespace backend.Repositories
     {
         Task<int> GetTotalCustomersAsync();
         Task<int> GetTotalProductsAsync();
-        Task<int> GetTotalQuotationsAsync();
-        Task<decimal> GetTotalRevenueAsync();
+        Task<int> GetTotalQuotationsAsync(string email = "", string role = "");
+        Task<decimal> GetTotalRevenueAsync(string email = "", string role = "");
     }
 }

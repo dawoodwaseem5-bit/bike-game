@@ -12,11 +12,13 @@ namespace backend.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly IConfiguration _config;
 
-        public AuthService(IUserRepository userRepository, IConfiguration config)
+        public AuthService(IUserRepository userRepository, ICustomerRepository customerRepository, IConfiguration config)
         {
             _userRepository = userRepository;
+            _customerRepository = customerRepository;
             _config = config;
         }
 
@@ -31,8 +33,8 @@ namespace backend.Services
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
@@ -81,6 +83,19 @@ namespace backend.Services
             };
 
             await _userRepository.AddAsync(newUser);
+
+            var newCustomer = new Customer
+            {
+                Name = req.Username,
+                Email = req.Email,
+                CreatedBy = "Self",
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true,
+                IsDeleted = false
+            };
+            await _customerRepository.AddAsync(newCustomer);
+            await _customerRepository.SaveChangesAsync();
+
             return (true, "Customer registered successfully!");
         }
     }

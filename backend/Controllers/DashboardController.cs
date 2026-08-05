@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services;
 
+using System.Security.Claims;
+
 namespace backend.Controllers
 {
     [Route("api/dashboard")]
@@ -19,7 +21,10 @@ namespace backend.Controllers
         [HttpGet("summary")]
         public async Task<IActionResult> GetSummary()
         {
-            var result = await _dashboardService.GetDashboardSummaryAsync();
+            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "";
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+
+            var result = await _dashboardService.GetDashboardSummaryAsync(email, role);
             return Ok(result);
         }
     }

@@ -13,11 +13,16 @@ namespace backend.Repositories
             _db = db;
         }
 
-        public async Task<(int TotalItems, IEnumerable<object> Items)> GetPaginatedAsync(int page, int pageSize, string search)
+        public async Task<(int TotalItems, IEnumerable<object> Items)> GetPaginatedAsync(int page, int pageSize, string search, string email = "", string role = "")
         {
             var query = _db.Quotations
                 .Include(q => q.Customer)
                 .Where(q => !q.IsDeleted);
+
+            if (role == "Customer" && !string.IsNullOrEmpty(email))
+            {
+                query = query.Where(q => q.Customer != null && q.Customer.Email == email);
+            }
 
             if (!string.IsNullOrWhiteSpace(search))
             {
