@@ -18,13 +18,15 @@ namespace backend.Services
             var totalProducts = await _dashboardRepository.GetTotalProductsAsync();
             var totalQuotations = await _dashboardRepository.GetTotalQuotationsAsync(email, role);
             var totalRevenue = await _dashboardRepository.GetTotalRevenueAsync(email, role);
+            var quotationsByStatus = await _dashboardRepository.GetQuotationsByStatusAsync(email, role);
 
             return new DashboardSummaryResponseDto
             {
                 TotalCustomers = totalCustomers,
                 TotalProducts = totalProducts,
                 TotalQuotations = totalQuotations,
-                TotalRevenue = totalRevenue
+                TotalRevenue = totalRevenue,
+                QuotationsByStatus = quotationsByStatus
             };
         }
     }

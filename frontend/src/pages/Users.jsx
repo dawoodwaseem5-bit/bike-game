@@ -30,25 +30,25 @@ function Users() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page">
       <h2>Manage Users</h2>
       
-      <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "20px" }}>
+      <div className="panel">
         <h3>Add New User (Manager / SalesRep)</h3>
         <form onSubmit={handleAddUser}>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Username: </label>
             <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Email: </label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Password: </label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Role: </label>
             <select value={role} onChange={e => setRole(e.target.value)}>
               <option value="SalesRep">Sales Rep</option>

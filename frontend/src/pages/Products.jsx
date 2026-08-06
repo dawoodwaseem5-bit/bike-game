@@ -6,6 +6,8 @@ function Products() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
+  const role = localStorage.getItem("userRole") || "";
+
   const [name, setName] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
@@ -82,44 +84,48 @@ function Products() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page">
       <h2>Products</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
       
-      <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "20px" }}>
+      {role === "Manager" && (
+      <div className="panel">
         <h3>{editId ? "Edit Product" : "Add New Product"}</h3>
         <form onSubmit={handleSaveProduct}>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Name: </label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} required />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Unit Price ($): </label>
             <input type="number" step="0.01" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} required />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="field">
             <label>Stock Quantity: </label>
             <input type="number" value={stockQuantity} onChange={e => setStockQuantity(e.target.value)} required />
           </div>
           <button type="submit">{editId ? "Update Product" : "Add Product"}</button>
-          {editId && <button type="button" onClick={handleCancel} style={{ marginLeft: "10px" }}>Cancel</button>}
+          {editId && <button type="button" onClick={handleCancel} className="ml">Cancel</button>}
         </form>
         {message && <p><b>{message}</b></p>}
       </div>
+      )}
 
-      <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>
+      {role !== "Manager" && message && <p><b>{message}</b></p>}
+
+      <table border="1" cellPadding="5" className="table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Unit Price</th>
             <th>Stock</th>
-            <th>Actions</th>
+            {role === "Manager" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {products.length === 0 ? (
-            <tr><td colSpan="5">No products found.</td></tr>
+            <tr><td colSpan={role === "Manager" ? 5 : 4}>No products found.</td></tr>
           ) : (
             products.map(p => (
               <tr key={p.productId}>
@@ -127,10 +133,12 @@ function Products() {
                 <td>{p.name}</td>
                 <td>${p.unitPrice?.toFixed(2)}</td>
                 <td>{p.stockQuantity}</td>
+                {role === "Manager" && (
                 <td>
                   <button onClick={() => handleEdit(p)}>Edit</button>
-                  <button onClick={() => handleDelete(p.productId)} style={{ marginLeft: "10px", color: "red" }}>Delete</button>
+                  <button onClick={() => handleDelete(p.productId)} className="ml error">Delete</button>
                 </td>
+                )}
               </tr>
             ))
           )}

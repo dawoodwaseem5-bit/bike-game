@@ -7,6 +7,8 @@ namespace backend.Services
         Task<object> GetCustomersPaginatedAsync(int page, int pageSize, string search);
         Task<CustomerResponseDto> CreateCustomerAsync(CustomerCreateDto dto, string username);
         Task<(bool Success, string Message, CustomerResponseDto? UpdatedCustomer)> UpdateCustomerAsync(int id, CustomerUpdateDto dto, string username);
+        Task<(bool Success, string Message, CustomerResponseDto? Profile)> GetMyProfileAsync(string email);
+        Task<(bool Success, string Message, CustomerResponseDto? UpdatedCustomer)> UpdateMyProfileAsync(string email, CustomerProfileUpdateDto dto);
         Task<(bool Success, string Message)> DeleteCustomerAsync(int id, string username);
     }
 }

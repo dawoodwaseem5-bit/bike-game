@@ -10,6 +10,8 @@ function Customers() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
+  const [address, setAddress] = useState("");
+  const [isActive, setIsActive] = useState(true);
 
   const loadCustomers = async () => {
     try {
@@ -34,7 +36,7 @@ function Customers() {
     try {
       const response = await fetchApi(`/customers/${editId}`, {
         method: "PUT",
-        body: JSON.stringify({ name, email, company })
+        body: JSON.stringify({ name, email, company, address, isActive })
       });
       if (response.ok) {
         setMessage("Customer updated successfully!");
@@ -54,6 +56,8 @@ function Customers() {
     setName(c.name);
     setEmail(c.email);
     setCompany(c.company || "");
+    setAddress(c.address || "");
+    setIsActive(c.isActive !== false);
     window.scrollTo(0, 0);
   };
 
@@ -77,51 +81,59 @@ function Customers() {
     setName("");
     setEmail("");
     setCompany("");
+    setAddress("");
+    setIsActive(true);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page">
       <h2>Customers</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
 
       {editId && (
-        <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "20px", background: "#f9f9f9" }}>
+        <div className="panel panel-edit">
           <h3>Edit Customer</h3>
           <form onSubmit={handleUpdateCustomer}>
-            <div style={{ marginBottom: "10px" }}>
+            <div className="field">
               <label>Name: </label>
               <input type="text" value={name} onChange={e => setName(e.target.value)} required />
             </div>
-            <div style={{ marginBottom: "10px" }}>
+            <div className="field">
               <label>Email: </label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
-            <div style={{ marginBottom: "10px" }}>
+            <div className="field">
               <label>Company: </label>
               <input type="text" value={company} onChange={e => setCompany(e.target.value)} />
             </div>
+            <div className="field">
+              <label>Address: </label>
+              <input type="text" value={address} onChange={e => setAddress(e.target.value)} className="w-addr" />
+            </div>
             <button type="submit">Update Customer</button>
-            <button type="button" onClick={handleCancel} style={{ marginLeft: "10px" }}>Cancel</button>
+            <button type="button" onClick={handleCancel} className="ml">Cancel</button>
           </form>
           {message && <p><b>{message}</b></p>}
         </div>
       )}
       {!editId && message && <p><b>{message}</b></p>}
 
-      <table border="1" cellPadding="5" style={{ borderCollapse: "collapse", width: "100%" }}>
+      <table border="1" cellPadding="5" className="table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Company</th>
+            <th>Address</th>
             <th>Active</th>
+            <th>Created</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {customers.length === 0 ? (
-            <tr><td colSpan="6">No customers found.</td></tr>
+            <tr><td colSpan="8">No customers found.</td></tr>
           ) : (
             customers.map(c => (
               <tr key={c.customerId}>
@@ -129,10 +141,12 @@ function Customers() {
                 <td>{c.name}</td>
                 <td>{c.email}</td>
                 <td>{c.company || "N/A"}</td>
+                <td>{c.address || "N/A"}</td>
                 <td>{c.isActive ? "Yes" : "No"}</td>
+                <td>{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "N/A"}</td>
                 <td>
                   <button onClick={() => handleEdit(c)}>Edit</button>
-                  <button onClick={() => handleDelete(c.customerId)} style={{ marginLeft: "10px", color: "red" }}>Delete</button>
+                  <button onClick={() => handleDelete(c.customerId)} className="ml error">Delete</button>
                 </td>
               </tr>
             ))

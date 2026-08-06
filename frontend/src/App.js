@@ -7,11 +7,17 @@ import Products from "./pages/Products";
 import Quotations from "./pages/Quotations";
 import Register from "./pages/Register";
 import Users from "./pages/Users";
+import Profile from "./pages/Profile";
+import "./styles/main.css";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, roles }) => {
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("userRole") || "";
   if (!token) {
     return <Navigate to="/login" replace />;
+  }
+  if (roles && !roles.includes(role)) {
+    return <Navigate to={role === "Customer" ? "/quotations" : "/"} replace />;
   }
   return children;
 };
@@ -27,25 +33,31 @@ const Layout = ({ children }) => {
 
   return (
     <div>
-      <nav style={{ background: "#eee", padding: "10px", marginBottom: "20px" }}>
-        <Link to="/" style={{ marginRight: "10px" }}>Dashboard</Link>
+      <nav className="nav">
+        {role !== "Customer" && (
+          <Link to="/">Dashboard</Link>
+        )}
         
         {role !== "Customer" && (
           <>
-            <Link to="/customers" style={{ marginRight: "10px" }}>Customers</Link>
-            <Link to="/products" style={{ marginRight: "10px" }}>Products</Link>
+            <Link to="/customers">Customers</Link>
+            <Link to="/products">Products</Link>
           </>
         )}
         
-        <Link to="/quotations" style={{ marginRight: "10px" }}>
+        <Link to="/quotations">
           {role === "Customer" ? "My Quotations" : "Quotations"}
         </Link>
-        
-        {role === "Manager" && (
-          <Link to="/users" style={{ marginRight: "10px" }}>Users</Link>
+
+        {role === "Customer" && (
+          <Link to="/profile">My Profile</Link>
         )}
         
-        <button onClick={handleLogout} style={{ marginLeft: "20px" }}>Logout</button>
+        {role === "Manager" && (
+          <Link to="/users">Users</Link>
+        )}
+        
+        <button onClick={handleLogout}>Logout</button>
       </nav>
       {children}
     </div>
@@ -60,19 +72,19 @@ function App() {
         <Route path="/register" element={<Register />} />
         
         <Route path="/" element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["Manager", "SalesRep"]}>
             <Layout><Dashboard /></Layout>
           </ProtectedRoute>
         } />
         
         <Route path="/customers" element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["Manager", "SalesRep"]}>
             <Layout><Customers /></Layout>
           </ProtectedRoute>
         } />
         
         <Route path="/products" element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["Manager", "SalesRep"]}>
             <Layout><Products /></Layout>
           </ProtectedRoute>
         } />
@@ -82,9 +94,15 @@ function App() {
             <Layout><Quotations /></Layout>
           </ProtectedRoute>
         } />
+
+        <Route path="/profile" element={
+          <ProtectedRoute roles={["Customer"]}>
+            <Layout><Profile /></Layout>
+          </ProtectedRoute>
+        } />
         
         <Route path="/users" element={
-          <ProtectedRoute>
+          <ProtectedRoute roles={["Manager"]}>
             <Layout><Users /></Layout>
           </ProtectedRoute>
         } />

@@ -6,5 +6,6 @@ namespace backend.DTOs
         public int TotalProducts { get; set; }
         public int TotalQuotations { get; set; }
         public decimal TotalRevenue { get; set; }
+        public Dictionary<string, int> QuotationsByStatus { get; set; } = new();
     }
 }

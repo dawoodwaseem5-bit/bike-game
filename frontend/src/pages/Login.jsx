@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchApi } from "../api/api";
+import "../styles/login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -18,10 +19,11 @@ function Login() {
 
       const data = await response.json();
       if (response.ok) {
+        const role = data.user?.role || "";
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", data.user?.role || "");
+        localStorage.setItem("userRole", role);
         setMessage(`Success! Welcome ${data.user?.username || email}`);
-        navigate("/");
+        navigate(role === "Customer" ? "/quotations" : "/");
       } else {
         setMessage(`Error: ${data.message}`);
       }
@@ -31,11 +33,11 @@ function Login() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="login-page">
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <div>
-          <label>Email: </label>
+        <div className="field">
+          <label>Email</label>
           <input
             type="email"
             value={email}
@@ -43,9 +45,8 @@ function Login() {
             required
           />
         </div>
-        <br />
-        <div>
-          <label>Password: </label>
+        <div className="field">
+          <label>Password</label>
           <input
             type="password"
             value={password}
@@ -53,13 +54,14 @@ function Login() {
             required
           />
         </div>
-        <br />
         <button type="submit">Login</button>
       </form>
-      <p>
-        <b>{message}</b>
-      </p>
-      <p>
+      {message && (
+        <p className="msg">
+          <b>{message}</b>
+        </p>
+      )}
+      <p className="link">
         If not already a user? <Link to="/register">Register here</Link>
       </p>
     </div>

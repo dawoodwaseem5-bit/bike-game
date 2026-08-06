@@ -87,6 +87,50 @@ namespace backend.Services
             return (true, "Customer updated successfully.", responseDto);
         }
 
+        public async Task<(bool Success, string Message, CustomerResponseDto? Profile)> GetMyProfileAsync(string email)
+        {
+            var customer = await _customerRepository.GetByEmailAsync(email);
+            if (customer == null)
+                return (false, "Customer profile not found.", null);
+
+            return (true, "OK", new CustomerResponseDto
+            {
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Address = customer.Address,
+                Company = customer.Company,
+                IsActive = customer.IsActive,
+                CreatedAt = customer.CreatedAt
+            });
+        }
+
+        public async Task<(bool Success, string Message, CustomerResponseDto? UpdatedCustomer)> UpdateMyProfileAsync(string email, CustomerProfileUpdateDto dto)
+        {
+            var customer = await _customerRepository.GetByEmailAsync(email);
+            if (customer == null)
+                return (false, "Customer profile not found.", null);
+
+            customer.Name = dto.Name;
+            customer.Address = dto.Address;
+            customer.Company = dto.Company;
+            customer.UpdatedAt = DateTime.UtcNow;
+            customer.UpdatedBy = email;
+
+            await _customerRepository.SaveChangesAsync();
+
+            return (true, "Profile updated successfully.", new CustomerResponseDto
+            {
+                CustomerId = customer.CustomerId,
+                Name = customer.Name,
+                Email = customer.Email,
+                Address = customer.Address,
+                Company = customer.Company,
+                IsActive = customer.IsActive,
+                CreatedAt = customer.CreatedAt
+            });
+        }
+
         public async Task<(bool Success, string Message)> DeleteCustomerAsync(int id, string username)
         {
             var customer = await _customerRepository.GetByIdAsync(id);

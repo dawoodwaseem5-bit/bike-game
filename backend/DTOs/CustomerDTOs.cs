@@ -40,6 +40,19 @@ namespace backend.DTOs
         public bool IsActive { get; set; } = true;
     }
 
+    public class CustomerProfileUpdateDto
+    {
+        [Required]
+        [MaxLength(200)]
+        public string Name { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string? Address { get; set; }
+
+        [MaxLength(200)]
+        public string? Company { get; set; }
+    }
+
     public class CustomerResponseDto
     {
         public int CustomerId { get; set; }

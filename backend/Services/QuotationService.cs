@@ -32,6 +32,20 @@ namespace backend.Services
             if (!await _quotationRepository.CustomerExistsAsync(dto.CustomerId))
                 return (false, "Customer not found.", null);
 
+            if (dto.TaxRate < 0)
+                return (false, "Tax rate cannot be negative.", null);
+
+            if (dto.Items == null || dto.Items.Count == 0)
+                return (false, "At least one line item is required.", null);
+
+            foreach (var item in dto.Items)
+            {
+                if (item.Quantity < 1)
+                    return (false, "Quantity must be at least 1.", null);
+                if (item.DiscountPercent < 0 || item.DiscountPercent > 100)
+                    return (false, "Discount percent must be between 0 and 100.", null);
+            }
+
             var quotation = new Quotation
             {
                 CustomerId = dto.CustomerId,

@@ -31,17 +31,17 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Manager,SalesRep")]
+        [Authorize(Roles = "SalesRep")]
         public async Task<IActionResult> CreateQuotation([FromBody] QuotationCreateDto dto)
         {
             var result = await _quotationService.CreateQuotationAsync(dto, GetEmail());
             if (!result.Success)
-                return NotFound(new { Message = result.Message });
+                return BadRequest(new { Message = result.Message });
 
             return CreatedAtAction(nameof(GetQuotations), new { id = result.Quotation!.QuotationId }, result.Quotation);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}/status")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
         {
@@ -52,7 +52,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Manager,SalesRep")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> DeleteQuotation(int id)
         {
             var result = await _quotationService.DeleteQuotationAsync(id, GetEmail());

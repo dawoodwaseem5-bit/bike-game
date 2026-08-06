@@ -33,7 +33,7 @@ function Quotations() {
 
   const loadLookups = useCallback(async () => {
     try {
-      if (role !== "Customer") {
+      if (role === "SalesRep") {
         const custRes = await fetchApi("/customers");
         if (custRes.ok) setCustomers((await custRes.json()).data || []);
 
@@ -143,26 +143,20 @@ function Quotations() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page">
       <h2>Quotations</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
       {message && (
         <p>
           <b>{message}</b>
         </p>
       )}
 
-      {role !== "Customer" && (
-        <div
-          style={{
-            border: "1px solid #ccc",
-            padding: "15px",
-            marginBottom: "20px",
-          }}
-        >
+      {role === "SalesRep" && (
+        <div className="panel">
           <h3>Create Quotation</h3>
           <form onSubmit={handleCreateQuotation}>
-            <div style={{ marginBottom: "10px" }}>
+            <div className="field">
               <label>Customer: </label>
               <select
                 value={customerId}
@@ -178,7 +172,7 @@ function Quotations() {
               </select>
             </div>
 
-            <div style={{ marginBottom: "10px" }}>
+            <div className="field">
               <label>Tax Rate (%): </label>
               <input
                 type="number"
@@ -189,16 +183,10 @@ function Quotations() {
               />
             </div>
 
-            <div
-              style={{
-                marginBottom: "10px",
-                padding: "10px",
-                border: "1px solid #eee",
-              }}
-            >
+            <div className="panel-inner">
               <h4>Line Items</h4>
               {items.map((item, index) => (
-                <div key={index} style={{ marginBottom: "5px" }}>
+                <div key={index} className="field-sm">
                   <select
                     value={item.productId}
                     onChange={(e) =>
@@ -214,11 +202,11 @@ function Quotations() {
                     ))}
                   </select>
 
-                  <label style={{ marginLeft: "10px" }}>Qty: </label>
+                  <label className="ml">Qty: </label>
                   <input
                     type="number"
                     min="1"
-                    style={{ width: "60px" }}
+                    className="w-qty"
                     value={item.quantity}
                     onChange={(e) =>
                       handleItemChange(index, "quantity", e.target.value)
@@ -226,11 +214,13 @@ function Quotations() {
                     required
                   />
 
-                  <label style={{ marginLeft: "10px" }}>Discount %: </label>
+                  <label className="ml">Discount %: </label>
                   <input
                     type="number"
                     step="0.01"
-                    style={{ width: "70px" }}
+                    min="0"
+                    max="100"
+                    className="w-disc"
                     value={item.discountPercent}
                     onChange={(e) =>
                       handleItemChange(index, "discountPercent", e.target.value)
@@ -241,7 +231,7 @@ function Quotations() {
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
-                      style={{ marginLeft: "10px", color: "red" }}
+                      className="ml error"
                     >
                       X
                     </button>
@@ -251,7 +241,7 @@ function Quotations() {
               <button
                 type="button"
                 onClick={handleAddItem}
-                style={{ marginTop: "10px" }}
+                className="mt-sm"
               >
                 + Add Item
               </button>
@@ -265,7 +255,7 @@ function Quotations() {
       <table
         border="1"
         cellPadding="5"
-        style={{ borderCollapse: "collapse", width: "100%" }}
+        className="table"
       >
         <thead>
           <tr>
@@ -275,13 +265,13 @@ function Quotations() {
             <th>Customer Name</th>
             <th>Total Amount</th>
             <th>Date</th>
-            {role !== "Customer" && <th>Actions</th>}
+            {role === "Manager" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {quotations.length === 0 ? (
             <tr>
-              <td colSpan={role !== "Customer" ? 7 : 6}>
+              <td colSpan={role === "Manager" ? 7 : 6}>
                 No quotations found.
               </td>
             </tr>
@@ -296,15 +286,15 @@ function Quotations() {
                 <td>{q.customerName}</td>
                 <td>${q.totalAmount?.toFixed(2)}</td>
                 <td>{new Date(q.createdAt).toLocaleDateString()}</td>
-                {role !== "Customer" && (
+                {role === "Manager" && (
                   <td>
-                    {role === "Manager" && q.status === "Pending" && (
+                    {q.status === "Pending" && (
                       <>
                         <button
                           onClick={() =>
                             handleUpdateStatus(q.quotationId, "Approved")
                           }
-                          style={{ color: "green" }}
+                          className="ok"
                         >
                           Approve
                         </button>
@@ -312,7 +302,7 @@ function Quotations() {
                           onClick={() =>
                             handleUpdateStatus(q.quotationId, "Rejected")
                           }
-                          style={{ color: "orange", marginLeft: "5px" }}
+                          className="ml warn"
                         >
                           Reject
                         </button>
@@ -320,7 +310,7 @@ function Quotations() {
                     )}
                     <button
                       onClick={() => handleDelete(q.quotationId)}
-                      style={{ marginLeft: "10px", color: "red" }}
+                      className="ml error"
                     >
                       Delete
                     </button>

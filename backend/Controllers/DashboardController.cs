@@ -8,7 +8,7 @@ namespace backend.Controllers
 {
     [Route("api/dashboard")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Manager,SalesRep")]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;

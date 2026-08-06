@@ -37,6 +37,11 @@ namespace backend.Repositories
             return await _db.Customers.FirstOrDefaultAsync(c => c.CustomerId == id && !c.IsDeleted);
         }
 
+        public async Task<Customer?> GetByEmailAsync(string email)
+        {
+            return await _db.Customers.FirstOrDefaultAsync(c => c.Email == email && !c.IsDeleted);
+        }
+
         public async Task AddAsync(Customer customer)
         {
             await _db.Customers.AddAsync(customer);

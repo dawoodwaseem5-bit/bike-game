@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchApi } from "../api/api";
+import "../styles/register.css";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -30,11 +31,11 @@ function Register() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="register-page">
       <h2>Register</h2>
       <form onSubmit={handleRegister}>
-        <div>
-          <label>Username: </label>
+        <div className="field">
+          <label>Username</label>
           <input
             type="text"
             value={username}
@@ -42,9 +43,8 @@ function Register() {
             required
           />
         </div>
-        <br />
-        <div>
-          <label>Email: </label>
+        <div className="field">
+          <label>Email</label>
           <input
             type="email"
             value={email}
@@ -52,9 +52,8 @@ function Register() {
             required
           />
         </div>
-        <br />
-        <div>
-          <label>Password: </label>
+        <div className="field">
+          <label>Password</label>
           <input
             type="password"
             value={password}
@@ -62,11 +61,14 @@ function Register() {
             required
           />
         </div>
-        <br />
         <button type="submit">Register</button>
       </form>
-      <p><b>{message}</b></p>
-      <p>
+      {message && (
+        <p className="msg">
+          <b>{message}</b>
+        </p>
+      )}
+      <p className="link">
         Already a user? <Link to="/login">Login here</Link>
       </p>
     </div>

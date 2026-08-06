@@ -29,6 +29,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -40,6 +41,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductUpdateDto dto)
         {
             var result = await _productService.UpdateProductAsync(id, dto, GetEmail());
@@ -50,6 +52,7 @@ namespace backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var username = User.FindFirstValue(ClaimTypes.Email) ?? "Unknown";
