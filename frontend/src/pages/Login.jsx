@@ -34,6 +34,7 @@ function Login() {
 
   return (
     <div className="login-page">
+      <h1>Sales Quotation Management</h1>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div className="field">

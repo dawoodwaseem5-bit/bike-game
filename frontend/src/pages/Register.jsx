@@ -32,6 +32,7 @@ function Register() {
 
   return (
     <div className="register-page">
+      <h1>Sales Quotation Management</h1>
       <h2>Register</h2>
       <form onSubmit={handleRegister}>
         <div className="field">
