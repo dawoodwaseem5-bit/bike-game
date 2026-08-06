@@ -1,6 +1,6 @@
 ================================================================================
   SALES QUOTATION MANAGEMENT - PROJECT NOTES
-  Last Updated: 2026-07-30
+  Last Updated: 2026-08-06
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -221,7 +221,45 @@ PROGRESS LOG
   [DONE] 2026-08-03 - User Management controllers implemented (Customer Self-Registration & Manager adding SalesRep)
   [DONE] 2026-08-03 - Refactored entire backend to a clean 3-Tier Architecture (Controllers > Services > Repositories)
   [DONE] 2026-08-04 - Grouped and implemented DTOs for Auth, Users, Customers, Products, Quotations, and Dashboard
+  [DONE] 2026-08-06 - Role-based access, customer profile, dashboard chart, UI styles, pages renamed to .jsx
   [ ]    Next       - Frontend UI design and routing (React)
+
+--------------------------------------------------------------------------------
+2026-08-06 - FILES CHANGED / ADDED
+--------------------------------------------------------------------------------
+
+Changed files:
+  backend/Controllers/CustomersController.cs
+  backend/Controllers/DashboardController.cs
+  backend/Controllers/ProductsController.cs
+  backend/Controllers/QuotationsController.cs
+  backend/DTOs/CustomerDTOs.cs
+  backend/DTOs/DashboardDTOs.cs
+  backend/Repositories/CustomerRepository.cs
+  backend/Repositories/DashboardRepository.cs
+  backend/Repositories/ICustomerRepository.cs
+  backend/Repositories/IDashboardRepository.cs
+  backend/Services/CustomerService.cs
+  backend/Services/DashboardService.cs
+  backend/Services/ICustomerService.cs
+  backend/Services/QuotationService.cs
+  frontend/package.json
+  frontend/package-lock.json
+  frontend/src/App.js
+  frontend/src/pages/Customers.jsx   (renamed from Customers.js)
+  frontend/src/pages/Dashboard.jsx   (renamed/rewritten from Dashboard.js)
+  frontend/src/pages/Login.jsx       (renamed from Login.js)
+  frontend/src/pages/Products.jsx    (renamed from Products.js)
+  frontend/src/pages/Quotations.jsx  (renamed from Quotations.js)
+  frontend/src/pages/Register.jsx    (renamed from Register.js)
+  frontend/src/pages/Users.jsx       (renamed from Users.js)
+  PROJECT_NOTES.txt
+
+New files:
+  frontend/src/pages/Profile.jsx
+  frontend/src/styles/main.css
+  frontend/src/styles/login.css
+  frontend/src/styles/register.css
 
 --------------------------------------------------------------------------------
 BUSINESS RULES (from doc)
