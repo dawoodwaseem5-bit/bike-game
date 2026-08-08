@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { fetchApi } from "../api/api";
+import { getRoleFromToken } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 import "../styles/login.css";
 
 function Login() {
@@ -8,6 +10,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,9 +22,8 @@ function Login() {
 
       const data = await response.json();
       if (response.ok) {
-        const role = data.user?.role || "";
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", role);
+        login(data.token);
+        const role = getRoleFromToken(data.token) || data.user?.role || "";
         setMessage(`Success! Welcome ${data.user?.username || email}`);
         navigate(role === "Customer" ? "/quotations" : "/");
       } else {

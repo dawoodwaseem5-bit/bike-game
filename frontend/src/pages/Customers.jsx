@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchApi } from "../api/api";
 
 function Customers() {
   const [customers, setCustomers] = useState([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
 
   const [editId, setEditId] = useState(null);
   const [name, setName] = useState("");
@@ -13,9 +14,9 @@ function Customers() {
   const [address, setAddress] = useState("");
   const [isActive, setIsActive] = useState(true);
 
-  const loadCustomers = async () => {
+  const loadCustomers = useCallback(async (q = "") => {
     try {
-      const response = await fetchApi("/customers");
+      const response = await fetchApi(`/customers?search=${encodeURIComponent(q)}`);
       if (response.ok) {
         const result = await response.json();
         setCustomers(result.data || []);
@@ -25,11 +26,11 @@ function Customers() {
     } catch (err) {
       setError("Error connecting to server");
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadCustomers();
-  }, []);
+    loadCustomers("");
+  }, [loadCustomers]);
 
   const handleUpdateCustomer = async (e) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ function Customers() {
       if (response.ok) {
         setMessage("Customer updated successfully!");
         handleCancel();
-        loadCustomers();
+        loadCustomers(search);
       } else {
         const data = await response.json();
         setMessage(`Error: ${data.message || JSON.stringify(data.errors) || "Failed to update"}`);
@@ -67,7 +68,7 @@ function Customers() {
       const response = await fetchApi(`/customers/${id}`, { method: "DELETE" });
       if (response.ok) {
         setMessage("Customer deleted.");
-        loadCustomers();
+        loadCustomers(search);
       } else {
         setMessage("Failed to delete.");
       }
@@ -89,6 +90,22 @@ function Customers() {
     <div className="page">
       <h2>Customers</h2>
       {error && <p className="error">{error}</p>}
+
+      <form
+        className="field"
+        onSubmit={(e) => {
+          e.preventDefault();
+          loadCustomers(search);
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search by name, email, or company..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button type="submit" className="ml">Search</button>
+      </form>
 
       {editId && (
         <div className="panel panel-edit">

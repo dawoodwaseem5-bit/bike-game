@@ -19,26 +19,35 @@ namespace backend.Controllers
         }
 
         private string GetEmail() => User.FindFirst(ClaimTypes.Email)?.Value ?? "system";
+        private string GetRole() => User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
         [HttpGet]
         public async Task<IActionResult> GetQuotations([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string search = "")
         {
-            var email = GetEmail();
-            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
-            
-            var result = await _quotationService.GetQuotationsPaginatedAsync(page, pageSize, search, email, role);
+            var result = await _quotationService.GetQuotationsPaginatedAsync(page, pageSize, search, GetEmail(), GetRole());
             return Ok(result);
         }
 
         [HttpPost]
-        [Authorize(Roles = "SalesRep")]
+        [Authorize(Roles = "SalesRep,Customer")]
         public async Task<IActionResult> CreateQuotation([FromBody] QuotationCreateDto dto)
         {
-            var result = await _quotationService.CreateQuotationAsync(dto, GetEmail());
+            var result = await _quotationService.CreateQuotationAsync(dto, GetEmail(), GetRole());
             if (!result.Success)
                 return BadRequest(new { Message = result.Message });
 
             return CreatedAtAction(nameof(GetQuotations), new { id = result.Quotation!.QuotationId }, result.Quotation);
+        }
+
+        [HttpPut("{id}/finalize")]
+        [Authorize(Roles = "SalesRep")]
+        public async Task<IActionResult> FinalizeQuotation(int id, [FromBody] QuotationFinalizeDto dto)
+        {
+            var result = await _quotationService.FinalizeQuotationAsync(id, dto, GetEmail());
+            if (!result.Success)
+                return BadRequest(new { Message = result.Message });
+
+            return Ok(result.UpdatedQuotation);
         }
 
         [HttpPut("{id}/status")]

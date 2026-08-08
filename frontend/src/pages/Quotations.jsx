@@ -1,25 +1,21 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { fetchApi } from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
 function Quotations() {
   const [quotations, setQuotations] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
+  const [finalizeId, setFinalizeId] = useState(null);
+  const [finalizeTax, setFinalizeTax] = useState(0);
+  const [finalizeDiscount, setFinalizeDiscount] = useState(0);
 
-  const role = localStorage.getItem("userRole") || "";
+  const { role } = useAuth();
 
-  // Form states
-  const [customerId, setCustomerId] = useState("");
-  const [taxRate, setTaxRate] = useState(0);
-  const [items, setItems] = useState([
-    { productId: "", quantity: 1, discountPercent: 0 },
-  ]);
-
-  const loadQuotations = useCallback(async () => {
+  const loadQuotations = useCallback(async (q = "") => {
     try {
-      const response = await fetchApi("/quotations");
+      const response = await fetchApi(`/quotations?search=${encodeURIComponent(q)}`);
       if (response.ok) {
         const result = await response.json();
         setQuotations(result.data || []);
@@ -31,78 +27,37 @@ function Quotations() {
     }
   }, []);
 
-  const loadLookups = useCallback(async () => {
-    try {
-      if (role === "SalesRep") {
-        const custRes = await fetchApi("/customers");
-        if (custRes.ok) setCustomers((await custRes.json()).data || []);
-
-        const prodRes = await fetchApi("/products");
-        if (prodRes.ok) setProducts((await prodRes.json()).data || []);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [role]);
-
   useEffect(() => {
     loadQuotations();
-    loadLookups();
-  }, [loadQuotations, loadLookups]);
+  }, [loadQuotations]);
 
-  const handleAddItem = () => {
-    setItems([...items, { productId: "", quantity: 1, discountPercent: 0 }]);
+  const openFinalize = (id) => {
+    setFinalizeId(id);
+    setFinalizeTax(0);
+    setFinalizeDiscount(0);
+    window.scrollTo(0, 0);
   };
 
-  const handleRemoveItem = (index) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
-
-  const handleItemChange = (index, field, value) => {
-    const newItems = [...items];
-    newItems[index][field] = value;
-    setItems(newItems);
-  };
-
-  const handleCreateQuotation = async (e) => {
+  const handleFinalize = async (e) => {
     e.preventDefault();
-    if (!customerId) return setMessage("Please select a customer");
-
-    const validItems = items
-      .filter((i) => i.productId && i.quantity > 0)
-      .map((i) => ({
-        productId: parseInt(i.productId),
-        quantity: parseInt(i.quantity),
-        discountPercent: parseFloat(i.discountPercent) || 0,
-      }));
-
-    if (validItems.length === 0)
-      return setMessage("Please add at least one valid product item");
-
     try {
-      const payload = {
-        customerId: parseInt(customerId),
-        taxRate: parseFloat(taxRate),
-        items: validItems,
-      };
-
-      const response = await fetchApi("/quotations", {
-        method: "POST",
-        body: JSON.stringify(payload),
+      const response = await fetchApi(`/quotations/${finalizeId}/finalize`, {
+        method: "PUT",
+        body: JSON.stringify({
+          taxRate: parseFloat(finalizeTax) || 0,
+          discountPercent: parseFloat(finalizeDiscount) || 0,
+        }),
       });
-
       if (response.ok) {
-        setMessage("Quotation created successfully!");
-        setCustomerId("");
-        setTaxRate(0);
-        setItems([{ productId: "", quantity: 1, discountPercent: 0 }]);
-        loadQuotations();
+        setMessage("Quotation finalized and sent for approval.");
+        setFinalizeId(null);
+        loadQuotations(search);
       } else {
         const data = await response.json();
-        setMessage(`Error: ${data.message || "Failed to create quotation"}`);
+        setMessage(`Error: ${data.message || "Failed to finalize"}`);
       }
     } catch (err) {
-      setMessage("Error creating quotation.");
+      setMessage("Error finalizing quotation.");
     }
   };
 
@@ -115,7 +70,7 @@ function Quotations() {
       });
       if (response.ok) {
         setMessage(`Quotation marked as ${status}`);
-        loadQuotations();
+        loadQuotations(search);
       } else {
         setMessage("Failed to update status.");
       }
@@ -133,7 +88,7 @@ function Quotations() {
       });
       if (response.ok) {
         setMessage("Quotation deleted.");
-        loadQuotations();
+        loadQuotations(search);
       } else {
         setMessage("Failed to delete.");
       }
@@ -144,7 +99,7 @@ function Quotations() {
 
   return (
     <div className="page">
-      <h2>Quotations</h2>
+      <h2>{role === "Customer" ? "My Quotations" : "Quotations"}</h2>
       {error && <p className="error">{error}</p>}
       {message && (
         <p>
@@ -152,102 +107,59 @@ function Quotations() {
         </p>
       )}
 
-      {role === "SalesRep" && (
-        <div className="panel">
-          <h3>Create Quotation</h3>
-          <form onSubmit={handleCreateQuotation}>
-            <div className="field">
-              <label>Customer: </label>
-              <select
-                value={customerId}
-                onChange={(e) => setCustomerId(e.target.value)}
-                required
-              >
-                <option value="">-- Select Customer --</option>
-                {customers.map((c) => (
-                  <option key={c.customerId} value={c.customerId}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+      {role !== "Customer" && (
+        <form
+          className="field"
+          onSubmit={(e) => {
+            e.preventDefault();
+            loadQuotations(search);
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Search by quote number or customer..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button type="submit" className="ml">Search</button>
+        </form>
+      )}
 
+      {role === "SalesRep" && finalizeId && (
+        <div className="panel panel-edit">
+          <h3>Finalize Quotation #{finalizeId}</h3>
+          <form onSubmit={handleFinalize}>
             <div className="field">
               <label>Tax Rate (%): </label>
               <input
                 type="number"
                 step="0.01"
-                value={taxRate}
-                onChange={(e) => setTaxRate(e.target.value)}
+                min="0"
+                value={finalizeTax}
+                onChange={(e) => setFinalizeTax(e.target.value)}
                 required
               />
             </div>
-
-            <div className="panel-inner">
-              <h4>Line Items</h4>
-              {items.map((item, index) => (
-                <div key={index} className="field-sm">
-                  <select
-                    value={item.productId}
-                    onChange={(e) =>
-                      handleItemChange(index, "productId", e.target.value)
-                    }
-                    required
-                  >
-                    <option value="">-- Product --</option>
-                    {products.map((p) => (
-                      <option key={p.productId} value={p.productId}>
-                        {p.name} (${p.unitPrice})
-                      </option>
-                    ))}
-                  </select>
-
-                  <label className="ml">Qty: </label>
-                  <input
-                    type="number"
-                    min="1"
-                    className="w-qty"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleItemChange(index, "quantity", e.target.value)
-                    }
-                    required
-                  />
-
-                  <label className="ml">Discount %: </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="100"
-                    className="w-disc"
-                    value={item.discountPercent}
-                    onChange={(e) =>
-                      handleItemChange(index, "discountPercent", e.target.value)
-                    }
-                  />
-
-                  {items.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItem(index)}
-                      className="ml error"
-                    >
-                      X
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={handleAddItem}
-                className="mt-sm"
-              >
-                + Add Item
-              </button>
+            <div className="field">
+              <label>Discount (%): </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={finalizeDiscount}
+                onChange={(e) => setFinalizeDiscount(e.target.value)}
+                required
+              />
             </div>
-
-            <button type="submit">Create Quotation</button>
+            <button type="submit">Submit Finalize</button>
+            <button
+              type="button"
+              className="ml"
+              onClick={() => setFinalizeId(null)}
+            >
+              Cancel
+            </button>
           </form>
         </div>
       )}
@@ -265,13 +177,13 @@ function Quotations() {
             <th>Customer Name</th>
             <th>Total Amount</th>
             <th>Date</th>
-            {role === "Manager" && <th>Actions</th>}
+            {(role === "Manager" || role === "SalesRep") && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {quotations.length === 0 ? (
             <tr>
-              <td colSpan={role === "Manager" ? 7 : 6}>
+              <td colSpan={role === "Manager" || role === "SalesRep" ? 7 : 6}>
                 No quotations found.
               </td>
             </tr>
@@ -286,6 +198,18 @@ function Quotations() {
                 <td>{q.customerName}</td>
                 <td>${q.totalAmount?.toFixed(2)}</td>
                 <td>{new Date(q.createdAt).toLocaleDateString()}</td>
+                {role === "SalesRep" && (
+                  <td>
+                    {q.status === "Draft" && (
+                      <button
+                        onClick={() => openFinalize(q.quotationId)}
+                        className="ok"
+                      >
+                        Finalize
+                      </button>
+                    )}
+                  </td>
+                )}
                 {role === "Manager" && (
                   <td>
                     {q.status === "Pending" && (

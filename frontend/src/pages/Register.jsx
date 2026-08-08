@@ -7,15 +7,34 @@ function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [company, setCompany] = useState("");
+  const [address, setAddress] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (!/^[a-zA-Z0-9_]{3,15}$/.test(username)) {
+      return setMessage("Username must be 3-15 characters (letters, numbers, underscore only).");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return setMessage("Please enter a valid email address.");
+    }
+    if (!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password)) {
+      return setMessage("Password must be at least 8 characters and include a letter and a number.");
+    }
+    if (!company.trim()) {
+      return setMessage("Company is required.");
+    }
+    if (!address.trim()) {
+      return setMessage("Address is required.");
+    }
+
     try {
       const response = await fetchApi("/auth/register", {
         method: "POST",
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, company: company.trim(), address: address.trim() }),
       });
 
       const data = await response.json();
@@ -59,6 +78,24 @@ function Register() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div className="field">
+          <label>Company</label>
+          <input
+            type="text"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            required
+          />
+        </div>
+        <div className="field">
+          <label>Address</label>
+          <textarea
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            rows={3}
             required
           />
         </div>

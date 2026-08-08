@@ -49,7 +49,14 @@ namespace backend.Repositories
 
         public async Task<Quotation?> GetByIdAsync(int id)
         {
-            return await _db.Quotations.FirstOrDefaultAsync(q => q.QuotationId == id && !q.IsDeleted);
+            return await _db.Quotations
+                .Include(q => q.QuotationItems)
+                .FirstOrDefaultAsync(q => q.QuotationId == id && !q.IsDeleted);
+        }
+
+        public async Task<Customer?> GetCustomerByEmailAsync(string email)
+        {
+            return await _db.Customers.FirstOrDefaultAsync(c => c.Email == email && !c.IsDeleted);
         }
 
         public async Task<bool> CustomerExistsAsync(int customerId)

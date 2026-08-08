@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fetchApi } from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
 function Products() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
 
-  const role = localStorage.getItem("userRole") || "";
+  const { role } = useAuth();
 
   const [name, setName] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
   const [editId, setEditId] = useState(null);
 
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async (q = "") => {
     try {
-      const response = await fetchApi("/products");
+      const response = await fetchApi(`/products?search=${encodeURIComponent(q)}`);
       if (response.ok) {
         const result = await response.json();
         setProducts(result.data || []);
@@ -25,11 +27,11 @@ function Products() {
     } catch (err) {
       setError("Error connecting to server");
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadProducts();
-  }, []);
+    loadProducts("");
+  }, [loadProducts]);
 
   const handleSaveProduct = async (e) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ function Products() {
       if (response.ok) {
         setMessage(editId ? "Product updated!" : "Product added!");
         handleCancel();
-        loadProducts();
+        loadProducts(search);
       } else {
         const data = await response.json();
         setMessage(`Error: ${data.message || JSON.stringify(data.errors) || "Failed to save"}`);
@@ -67,7 +69,7 @@ function Products() {
       const response = await fetchApi(`/products/${id}`, { method: "DELETE" });
       if (response.ok) {
         setMessage("Product deleted.");
-        loadProducts();
+        loadProducts(search);
       } else {
         setMessage("Failed to delete.");
       }
@@ -87,6 +89,22 @@ function Products() {
     <div className="page">
       <h2>Products</h2>
       {error && <p className="error">{error}</p>}
+
+      <form
+        className="field"
+        onSubmit={(e) => {
+          e.preventDefault();
+          loadProducts(search);
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button type="submit" className="ml">Search</button>
+      </form>
       
       {role === "Manager" && (
       <div className="panel">

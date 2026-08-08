@@ -18,6 +18,12 @@ namespace backend.DTOs
         public decimal DiscountPercent { get; set; }
     }
 
+    public class QuotationFinalizeDto
+    {
+        public decimal TaxRate { get; set; }
+        public decimal DiscountPercent { get; set; }
+    }
+
     public class QuotationResponseDto
     {
         public int QuotationId { get; set; }

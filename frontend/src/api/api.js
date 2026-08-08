@@ -1,10 +1,10 @@
-const API_BASE_URL = "http://localhost:5273/api";
+import { clearAuth, getToken } from "./auth";
 
-const getToken = () => localStorage.getItem("token");
+const API_BASE_URL = "http://localhost:5273/api";
 
 export const fetchApi = async (endpoint, options = {}) => {
   const token = getToken();
-  
+
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
@@ -19,9 +19,8 @@ export const fetchApi = async (endpoint, options = {}) => {
     headers,
   });
 
-  // If unauthorized, we might want to clear token and redirect to login
   if (response.status === 401) {
-    localStorage.removeItem("token");
+    clearAuth();
     window.location.href = "/login";
   }
 

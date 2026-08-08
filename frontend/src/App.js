@@ -5,14 +5,16 @@ import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import Quotations from "./pages/Quotations";
+import CreateQuotation from "./pages/CreateQuotation";
+import RequestQuotation from "./pages/RequestQuotation";
 import Register from "./pages/Register";
 import Users from "./pages/Users";
 import Profile from "./pages/Profile";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import "./styles/main.css";
 
 const ProtectedRoute = ({ children, roles }) => {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("userRole") || "";
+  const { token, role } = useAuth();
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -23,13 +25,7 @@ const ProtectedRoute = ({ children, roles }) => {
 };
 
 const Layout = ({ children }) => {
-  const role = localStorage.getItem("userRole") || "";
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userRole");
-    window.location.href = "/login";
-  };
+  const { role, logout } = useAuth();
 
   return (
     <div>
@@ -39,10 +35,17 @@ const Layout = ({ children }) => {
         )}
         
         {role !== "Customer" && (
-          <>
-            <Link to="/customers">Customers</Link>
-            <Link to="/products">Products</Link>
-          </>
+          <Link to="/customers">Customers</Link>
+        )}
+
+        <Link to="/products">Products</Link>
+
+        {role === "SalesRep" && (
+          <Link to="/create-quotation">Create Quotation</Link>
+        )}
+
+        {role === "Customer" && (
+          <Link to="/request-quotation">Request Quotation</Link>
         )}
         
         <Link to="/quotations">
@@ -57,57 +60,77 @@ const Layout = ({ children }) => {
           <Link to="/users">Users</Link>
         )}
         
-        <button onClick={handleLogout}>Logout</button>
+        <button onClick={logout}>Logout</button>
       </nav>
       {children}
     </div>
   );
 };
 
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      
+      <Route path="/" element={
+        <ProtectedRoute roles={["Manager", "SalesRep"]}>
+          <Layout><Dashboard /></Layout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/customers" element={
+        <ProtectedRoute roles={["Manager", "SalesRep"]}>
+          <Layout><Customers /></Layout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/products" element={
+        <ProtectedRoute roles={["Manager", "SalesRep", "Customer"]}>
+          <Layout><Products /></Layout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/quotations" element={
+        <ProtectedRoute>
+          <Layout><Quotations /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/create-quotation" element={
+        <ProtectedRoute roles={["SalesRep"]}>
+          <Layout><CreateQuotation /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/request-quotation" element={
+        <ProtectedRoute roles={["Customer"]}>
+          <Layout><RequestQuotation /></Layout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/profile" element={
+        <ProtectedRoute roles={["Customer"]}>
+          <Layout><Profile /></Layout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/users" element={
+        <ProtectedRoute roles={["Manager"]}>
+          <Layout><Users /></Layout>
+        </ProtectedRoute>
+      } />
+    </Routes>
+  );
+}
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
-        <Route path="/" element={
-          <ProtectedRoute roles={["Manager", "SalesRep"]}>
-            <Layout><Dashboard /></Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/customers" element={
-          <ProtectedRoute roles={["Manager", "SalesRep"]}>
-            <Layout><Customers /></Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/products" element={
-          <ProtectedRoute roles={["Manager", "SalesRep"]}>
-            <Layout><Products /></Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/quotations" element={
-          <ProtectedRoute>
-            <Layout><Quotations /></Layout>
-          </ProtectedRoute>
-        } />
-
-        <Route path="/profile" element={
-          <ProtectedRoute roles={["Customer"]}>
-            <Layout><Profile /></Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/users" element={
-          <ProtectedRoute roles={["Manager"]}>
-            <Layout><Users /></Layout>
-          </ProtectedRoute>
-        } />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 

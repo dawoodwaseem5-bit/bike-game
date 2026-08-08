@@ -7,10 +7,12 @@ namespace backend.Services
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customerRepository;
+        private readonly IUserRepository _userRepository;
 
-        public CustomerService(ICustomerRepository customerRepository)
+        public CustomerService(ICustomerRepository customerRepository, IUserRepository userRepository)
         {
             _customerRepository = customerRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<object> GetCustomersPaginatedAsync(int page, int pageSize, string search)
@@ -140,6 +142,15 @@ namespace backend.Services
             customer.IsDeleted = true;
             customer.UpdatedAt = DateTime.UtcNow;
             customer.UpdatedBy = username;
+
+            var user = await _userRepository.GetByEmailAsync(customer.Email);
+            if (user != null)
+            {
+                user.IsDeleted = true;
+                user.IsActive = false;
+                user.UpdatedAt = DateTime.UtcNow;
+                user.UpdatedBy = username;
+            }
 
             await _customerRepository.SaveChangesAsync();
 

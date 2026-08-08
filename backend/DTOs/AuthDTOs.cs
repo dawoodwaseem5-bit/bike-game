@@ -25,5 +25,13 @@ namespace backend.DTOs
 
         [Required]
         public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(200)]
+        public string Company { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(500)]
+        public string Address { get; set; } = string.Empty;
     }
 }

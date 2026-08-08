@@ -31,6 +31,20 @@ namespace backend.Services
                 return (false, "Invalid email or password.", "", null);
             }
 
+            if (user.IsDeleted || !user.IsActive)
+            {
+                return (false, "This account has been deactivated.", "", null);
+            }
+
+            if (user.Role == "Customer")
+            {
+                var customer = await _customerRepository.GetByEmailAsync(user.Email);
+                if (customer == null)
+                {
+                    return (false, "This account has been deactivated.", "", null);
+                }
+            }
+
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
@@ -88,6 +102,8 @@ namespace backend.Services
             {
                 Name = req.Username,
                 Email = req.Email,
+                Company = req.Company,
+                Address = req.Address,
                 CreatedBy = "Self",
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
